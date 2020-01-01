@@ -4,12 +4,26 @@
 for ((i=1;i<10;i++))
 do
  for ((h=1;h<=i;h++))
-  do
-#   [ $i -ge $h ]
+  do  
   echo -n  "$i*$h=`echo $(($i*$h))` "
 # num=$(($i*$h))
 # echo -n "$i*$h=$num "
-
+  done
+  echo  ""
 done
+
+
+
+#!/usr/bin/env bash
+#
+#
+for ((i=1;i<10;i++))
+do
+ for ((h=1;h<10;h++))
+  do
+    [ $i -ge $h ]&&echo -n  "$i*$h=`echo $(($i*$h))` "
+# num=$(($i*$h))
+# echo -n "$i*$h=$num "
+  done
   echo  ""
 done
