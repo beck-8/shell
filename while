@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#
+#功能1：统计系统登录用户的数量
+#功能2：在系统中添加用户（开发专用）
+#功能3：统计系统中/opt目录下的文件数量
+#功能4：统计系统中/etc/yum.repos.d/目录下的源仓库文件的数量，并将仓库名记录文件
+#功能5：检测你的主机所在网段内存活的ip地址，并记录文件
+#功能6：退出
+#功能7：刷新
+#
+
+while true;do
+	cat <<-EOF
+ +---------------------------------------------------------------------------+
+ |                                   菜单                                    |
+ +---------------------------------------------------------------------------+
+ | a.统计系统登录用户的数量                                                  |
+ | b.在系统中添加用户（开发专用）                                            |
+ | c.统计系统中/opt目录下的文件数量                                          |
+ | d.统计系统中/etc/yum.repos.d/目录下的源仓库文件的数量，并将仓库名记录文件 |
+ | e.检测你的主机所在网段内存活的ip地址，并记录文件                          |
+ | q.退出                                                                    |
+ | f.刷新                                                                    |
+ +---------------------------------------------------------------------------+
+EOF
+read -p "请输入指令：" key
+case $key in
+  a)
+	echo "在线用户为：`w |wc -l`"
+;;
+  b)
+	read -p "请输入uid：" uid
+		awk -F':' '{print $3}' /etc/passwd|grep $uid &>/dev/null
+		if [ $? -eq 0 ];then
+			echo "该UID已经存在"
+			exit
+		fi
+	read -p "请输入gid：" gid
+		awk -F':' '{print $3}' /etc/group|grep $uid &>/dev/null
+		if [ $? -eq 0 ];then
+			echo "该gid已经存在"
+			exit
+		else
+			read -p "请输入组名：" group
+			groupadd -g $gid $group
+		fi
+	read -p "请输入bash类型：" bash
+	read -p "请输入家目录：" home
+	read -p "请输入用户名：" name
+		awk -F':' '{print $1}' /etc/passwd|grep $uid &>/dev/null
+		if [ $? -eq 0 ];then
+			echo "该用户名已经存在"
+			exit
+		fi
+	useradd -u $uid -g $gid -d $home -s $bash $name
+	if [ $? -eq 0 ];then
+		echo "用户添加成功"
+	else
+		echo "用户添加失败"
+	fi
+;;		
+  c)
+	echo "/opt目录下文件数量为：$(ls -f /opt|wc -l)"
+;;
+  d)
+	echo "源仓库数量：$(ls -f /etc/yum.repos.d|wc -l)" && $(ls /etc/yum.repos.d/ >./yum-name)
+;;
+  e)
+	for i in `seq 1 254`;do
+	{
+		ping 172.17.0.$i -c1 >/dev/null && echo "172.17.0.$i" >./ip-up.txt
+	}&
+	done
+	wait
+;;
+  q)
+	exit
+;;
+  f)
+	clear
+;;
+  *)
+	echo "请输入正确指令："
+;;
+esac
+done
