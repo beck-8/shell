@@ -26,7 +26,7 @@ EOF
 read -p "请输入指令：" key
 case $key in
   a)
-	echo "在线用户为：`w |wc -l`"
+	echo "在线用户为：`w | grep -v "load average" | grep -v "USER" |wc -l`"
 ;;
   b)
 	read -p "请输入uid：" uid
